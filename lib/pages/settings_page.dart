@@ -7,6 +7,29 @@ import '../controllers/theme_controller.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  Future<void> _confirmLogout(AuthController authController) async {
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Get.back(result: true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await authController.logout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
@@ -23,58 +46,67 @@ class SettingsPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            CircleAvatar(
-              radius: 36,
-              backgroundImage: NetworkImage(user.image),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundImage: NetworkImage(user.image),
+                      onBackgroundImageError: (_, __) {},
+                      child: user.image.isEmpty ? const Icon(Icons.person) : null,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.fullName,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '@${user.username}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(user.email),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 16),
-            _InfoRow(label: 'Username', value: user.username),
-            _InfoRow(label: 'Full Name', value: user.fullName),
-            _InfoRow(label: 'Email', value: user.email),
-            const Divider(height: 32),
-            Obx(() {
-              return SwitchListTile(
-                title: const Text('Dark Theme'),
-                value: themeController.isDarkMode.value,
-                onChanged: themeController.toggleTheme,
-              );
-            }),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: authController.logout,
-              icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
+            const SizedBox(height: 12),
+            Card(
+              child: Column(
+                children: [
+                  Obx(() {
+                    return SwitchListTile(
+                      title: const Text('Dark Theme'),
+                      subtitle: const Text('Use dark mode across the app'),
+                      value: themeController.isDarkMode.value,
+                      onChanged: themeController.toggleTheme,
+                    );
+                  }),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                subtitle: const Text('Clear cached session and go to login'),
+                onTap: () => _confirmLogout(authController),
+              ),
             ),
           ],
         );
       }),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              '$label:',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-          ),
-          Expanded(child: Text(value)),
-        ],
-      ),
     );
   }
 }

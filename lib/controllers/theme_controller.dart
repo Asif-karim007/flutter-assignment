@@ -14,10 +14,12 @@ class ThemeController extends GetxController {
 
   Future<void> loadTheme() async {
     isDarkMode.value = _storageService.getSavedThemeMode();
+    Get.changeThemeMode(themeMode);
   }
 
   Future<void> toggleTheme(bool value) async {
     isDarkMode.value = value;
     await _storageService.saveThemeMode(value);
+    Get.changeThemeMode(themeMode);
   }
 }

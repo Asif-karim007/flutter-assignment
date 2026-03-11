@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -96,6 +97,8 @@ class ApiService {
       return decoded;
     } on SocketException {
       throw const ApiException('No internet connection. Please try again.');
+    } on TimeoutException {
+      throw const ApiException('Request timed out. Please try again.');
     } on HttpException {
       throw const ApiException('Could not reach server. Please try again.');
     } on FormatException {

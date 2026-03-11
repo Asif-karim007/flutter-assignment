@@ -98,8 +98,20 @@ class _PostsPageState extends State<PostsPage>
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
                   onTap: () => Get.toNamed(AppRoutes.postDetail, arguments: post),
-                  title: Text(post.title),
-                  subtitle: Text(post.preview),
+                  title: Text(
+                    post.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      post.preview,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
               );
             },
