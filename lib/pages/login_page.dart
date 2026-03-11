@@ -41,6 +41,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
@@ -48,11 +49,17 @@ class _LoginPageState extends State<LoginPage> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              colorScheme.primaryContainer,
-              colorScheme.surface,
-              colorScheme.secondaryContainer,
-            ],
+            colors: isDark
+                ? [
+                    const Color(0xFF0B1220),
+                    const Color(0xFF111C33),
+                    const Color(0xFF162746),
+                  ]
+                : [
+                    const Color(0xFFEAF2FF),
+                    const Color(0xFFF4F8FF),
+                    const Color(0xFFE2EEFF),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -62,7 +69,8 @@ class _LoginPageState extends State<LoginPage> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 460),
                 child: Card(
-                  elevation: 2,
+                  elevation: isDark ? 2 : 1,
+                  color: isDark ? null : Colors.white.withOpacity(0.96),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Form(
@@ -158,6 +166,10 @@ class _LoginPageState extends State<LoginPage> {
 
                               return ElevatedButton.icon(
                                 onPressed: isLoading ? null : _submit,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF0F5FCC),
+                                  foregroundColor: Colors.white,
+                                ),
                                 icon: isLoading
                                     ? const SizedBox(
                                         width: 18,

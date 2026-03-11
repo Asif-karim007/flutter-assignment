@@ -83,6 +83,7 @@ class _PostsPageState extends State<PostsPage>
           onRefresh: _controller.fetchInitialPosts,
           child: ListView.builder(
             controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
             itemCount: itemCount,
             itemBuilder: (context, index) {
               if (index >= _controller.posts.length) {
@@ -95,7 +96,7 @@ class _PostsPageState extends State<PostsPage>
               final PostModel post = _controller.posts[index];
 
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
                 child: ListTile(
                   onTap: () => Get.toNamed(AppRoutes.postDetail, arguments: post),
                   title: Text(

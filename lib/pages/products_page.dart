@@ -83,6 +83,7 @@ class _ProductsPageState extends State<ProductsPage>
           onRefresh: _controller.fetchInitialProducts,
           child: ListView.builder(
             controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
             itemCount: itemCount,
             itemBuilder: (context, index) {
               if (index >= _controller.products.length) {
@@ -95,9 +96,9 @@ class _ProductsPageState extends State<ProductsPage>
               final ProductModel product = _controller.products[index];
 
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   onTap: () => Get.toNamed(AppRoutes.productDetail, arguments: product),
                   child: Padding(
                     padding: const EdgeInsets.all(10),
