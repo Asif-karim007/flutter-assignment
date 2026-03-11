@@ -1,90 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-void main() {
+import 'controllers/auth_controller.dart';
+import 'controllers/post_controller.dart';
+import 'controllers/product_controller.dart';
+import 'controllers/theme_controller.dart';
+import 'core/services/api_service.dart';
+import 'core/services/storage_service.dart';
+import 'routes/app_routes.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final storageService = StorageService();
+  await storageService.init();
+
+  final apiService = ApiService();
+
+  Get.put<StorageService>(storageService, permanent: true);
+  Get.put<ApiService>(apiService, permanent: true);
+
+  final themeController = Get.put<ThemeController>(
+    ThemeController(storageService),
+    permanent: true,
+  );
+  await themeController.loadTheme();
+
+  final authController = Get.put<AuthController>(
+    AuthController(apiService, storageService),
+    permanent: true,
+  );
+  await authController.restoreSession();
+
+  Get.put<ProductController>(ProductController(apiService), permanent: true);
+  Get.put<PostController>(PostController(apiService), permanent: true);
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
+    final themeController = Get.find<ThemeController>();
+    final authController = Get.find<AuthController>();
 
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return Obx(() {
+      return GetMaterialApp(
+        title: 'DummyJSON App',
+        debugShowCheckedModeBanner: false,
+        themeMode: themeController.themeMode,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+        ),
+        initialRoute: authController.isLoggedIn ? AppRoutes.home : AppRoutes.login,
+        getPages: AppRoutes.pages,
+      );
+    });
   }
 }
